@@ -1,0 +1,47 @@
+// generated from rosidl_generator_dds_idl/resource/msg.idl.em
+
+#ifndef __test_msgs__msg__DynamicArrayPrimitives__idl__
+#define __test_msgs__msg__DynamicArrayPrimitives__idl__
+
+
+module test_msgs
+{
+
+module msg
+{
+
+module dds_
+{
+
+
+
+
+struct DynamicArrayPrimitives_
+{
+
+  sequence<boolean> bool_values_;
+  sequence<octet> byte_values_;
+  sequence<char> char_values_;
+  sequence<float> float32_values_;
+  sequence<double> float64_values_;
+  sequence<octet> int8_values_;
+  sequence<octet> uint8_values_;
+  sequence<short> int16_values_;
+  sequence<unsigned short> uint16_values_;
+  sequence<long> int32_values_;
+  sequence<unsigned long> uint32_values_;
+  sequence<long long> int64_values_;
+  sequence<unsigned long long> uint64_values_;
+  sequence<string> string_values_;
+  long check_;
+
+};  // struct DynamicArrayPrimitives_
+
+
+};  // module dds_
+
+};  // module msg
+
+};  // module test_msgs
+
+#endif  // __test_msgs__msg__DynamicArrayPrimitives__idl__
