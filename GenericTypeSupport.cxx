@@ -121,8 +121,11 @@ GenericTypeSupport_register_external_type(
   const char * type_name,
   struct DDS_TypeCode * type_code)
 {
+  DDSTypeSupport * dds_data_type = NULL;
   struct PRESTypePlugin * presTypePlugin = NULL;
   DDS_ReturnCode_t retcode = DDS_RETCODE_ERROR;
+  DDS_Boolean delete_data_type = DDS_BOOLEAN_FALSE;
+  RTIBool already_registered = RTI_FALSE;
 
   if (type_code == NULL) {
     goto finError;
@@ -138,20 +141,40 @@ GenericTypeSupport_register_external_type(
     goto finError;
   }
 
-  retcode = participant->register_type(type_name, presTypePlugin, NULL, RTI_TRUE);
+  dds_data_type = new GenericTypeTypeSupport(true);
+  if (dds_data_type == NULL) {
+    fprintf(stderr, "Error while registering external type\n");
+    goto finError;
+  }
+  delete_data_type = RTI_TRUE;
+
+  presTypePlugin->_userBuffer = (PRESWord *)dds_data_type;
+  already_registered = participant->is_type_registered(type_name);
+
+  retcode = participant->register_type(type_name, presTypePlugin, NULL, !already_registered);
   //retcode = DDS_DomainParticipant_register_type(
   //    participant,
   //    type_name,
   //    presTypePlugin,
   //    NULL /* registration_data */);
   if (retcode != DDS_RETCODE_OK) {
+    fprintf(stderr, "error while registering external type\n");
     goto finError;
   }
-  return DDS_RETCODE_OK;
+
+  if (!already_registered) {
+    delete_data_type = DDS_BOOLEAN_FALSE;
+  }
+
+  retcode = DDS_RETCODE_OK;
 
 finError:
   if (presTypePlugin != NULL) {
     GenericTypePlugin_delete(presTypePlugin);
+  }
+  if (delete_data_type) {
+    delete (GenericTypeTypeSupport *)dds_data_type;
+    dds_data_type = NULL;
   }
 
   return retcode;

@@ -54,8 +54,7 @@ or consult the RTI Connext manual.
 
 #include "GenericTypePlugin.h"
 
-//#include "dds_c/dds_c_typecode_impl.h"
-extern DDS_Boolean DDS_TypeCode_is_type_keyed(const DDS_TypeCode * type);
+#include "dds_c/dds_c_typecode_impl.h"
 
 /* ----------------------------------------------------------------------------
 *  Type GenericType
@@ -1495,7 +1494,9 @@ GenericTypePlugin_new_external(struct DDS_TypeCode * external_type_code)
     (PRESTypePluginReturnSampleFunction)
     GenericTypePlugin_return_sample;
 
-    plugin->getKeyKindFnc = GenericTypePlugin_get_external_key_kind(external_type_code);
+    //plugin->getKeyKindFnc = GenericTypePlugin_get_external_key_kind(external_type_code);
+    plugin->getKeyKindFnc = (PRESTypePluginGetKeyKindFunction)
+      GenericTypePlugin_get_key_kind;
 
     plugin->getSerializedKeyMaxSizeFnc =   
     (PRESTypePluginGetSerializedKeyMaxSizeFunction)

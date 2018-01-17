@@ -39,6 +39,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
 {
     static RTIBool is_initialized = RTI_FALSE;
 
+    static DDS_TypeCode test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_my_key_string = DDS_INITIALIZE_STRING_TYPECODE((32));
     static DDS_TypeCode test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_bool_values__sequence = DDS_INITIALIZE_SEQUENCE_TYPECODE((100),NULL);
     static DDS_TypeCode test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_byte_values__sequence = DDS_INITIALIZE_SEQUENCE_TYPECODE((100),NULL);
     static DDS_TypeCode test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_char_values__sequence = DDS_INITIALIZE_SEQUENCE_TYPECODE((100),NULL);
@@ -54,11 +55,11 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
     static DDS_TypeCode test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_uint64_values__sequence = DDS_INITIALIZE_SEQUENCE_TYPECODE((100),NULL);
     static DDS_TypeCode test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_string_values__string = DDS_INITIALIZE_STRING_TYPECODE((255));
     static DDS_TypeCode test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_string_values__sequence = DDS_INITIALIZE_SEQUENCE_TYPECODE((100),NULL);
-    static DDS_TypeCode_Member test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[15]=
+    static DDS_TypeCode_Member test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[16]=
     {
 
         {
-            (char *)"bool_values_",/* Member name */
+            (char *)"my_key",/* Member name */
             {
                 0,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -69,13 +70,13 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             0, /* Ignored */
             0, /* Ignored */
             NULL, /* Ignored */
-            RTI_CDR_REQUIRED_MEMBER, /* Is a key? */
+            RTI_CDR_KEY_MEMBER , /* Is a key? */
             DDS_PUBLIC_MEMBER,/* Member visibility */
             1,
             NULL/* Ignored */
         }, 
         {
-            (char *)"byte_values_",/* Member name */
+            (char *)"bool_values_",/* Member name */
             {
                 1,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -92,7 +93,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"char_values_",/* Member name */
+            (char *)"byte_values_",/* Member name */
             {
                 2,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -109,7 +110,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"float32_values_",/* Member name */
+            (char *)"char_values_",/* Member name */
             {
                 3,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -126,7 +127,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"float64_values_",/* Member name */
+            (char *)"float32_values_",/* Member name */
             {
                 4,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -143,7 +144,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"int8_values_",/* Member name */
+            (char *)"float64_values_",/* Member name */
             {
                 5,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -160,7 +161,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"uint8_values_",/* Member name */
+            (char *)"int8_values_",/* Member name */
             {
                 6,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -177,7 +178,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"int16_values_",/* Member name */
+            (char *)"uint8_values_",/* Member name */
             {
                 7,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -194,7 +195,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"uint16_values_",/* Member name */
+            (char *)"int16_values_",/* Member name */
             {
                 8,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -211,7 +212,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"int32_values_",/* Member name */
+            (char *)"uint16_values_",/* Member name */
             {
                 9,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -228,7 +229,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"uint32_values_",/* Member name */
+            (char *)"int32_values_",/* Member name */
             {
                 10,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -245,7 +246,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"int64_values_",/* Member name */
+            (char *)"uint32_values_",/* Member name */
             {
                 11,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -262,7 +263,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"uint64_values_",/* Member name */
+            (char *)"int64_values_",/* Member name */
             {
                 12,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -279,7 +280,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"string_values_",/* Member name */
+            (char *)"uint64_values_",/* Member name */
             {
                 13,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
@@ -296,9 +297,26 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             NULL/* Ignored */
         }, 
         {
-            (char *)"check_",/* Member name */
+            (char *)"string_values_",/* Member name */
             {
                 14,/* Representation ID */          
+                DDS_BOOLEAN_FALSE,/* Is a pointer? */
+                -1, /* Bitfield bits */
+                NULL/* Member type code is assigned later */
+            },
+            0, /* Ignored */
+            0, /* Ignored */
+            0, /* Ignored */
+            NULL, /* Ignored */
+            RTI_CDR_REQUIRED_MEMBER, /* Is a key? */
+            DDS_PUBLIC_MEMBER,/* Member visibility */
+            1,
+            NULL/* Ignored */
+        }, 
+        {
+            (char *)"check_",/* Member name */
+            {
+                15,/* Representation ID */          
                 DDS_BOOLEAN_FALSE,/* Is a pointer? */
                 -1, /* Bitfield bits */
                 NULL/* Member type code is assigned later */
@@ -324,7 +342,7 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
             0, /* Ignored */
             0, /* Ignored */
             NULL, /* Ignored */
-            15, /* Number of members */
+            16, /* Number of members */
             test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members, /* Members */
             DDS_VM_NONE  /* Ignored */         
         }}; /* Type code for test_msgs_msg_dds__DynamicArrayPrimitives_*/
@@ -361,21 +379,23 @@ DDS_TypeCode* test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode()
 
     test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_string_values__sequence._data._typeCode = (RTICdrTypeCode *)&test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_string_values__string;
 
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[0]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_bool_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[1]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_byte_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[2]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_char_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[3]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_float32_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[4]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_float64_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[5]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_int8_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[6]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_uint8_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[7]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_int16_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[8]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_uint16_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[9]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_int32_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[10]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_uint32_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[11]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_int64_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[12]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_uint64_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[13]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_string_values__sequence;
-    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[14]._representation._typeCode = (RTICdrTypeCode *)&DDS_g_tc_long;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[0]._representation._typeCode = (RTICdrTypeCode *)&test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_my_key_string;
+
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[1]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_bool_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[2]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_byte_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[3]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_char_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[4]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_float32_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[5]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_float64_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[6]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_int8_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[7]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_uint8_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[8]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_int16_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[9]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_uint16_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[10]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_int32_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[11]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_uint32_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[12]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_int64_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[13]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_uint64_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[14]._representation._typeCode = (RTICdrTypeCode *)& test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_string_values__sequence;
+    test_msgs_msg_dds__DynamicArrayPrimitives__g_tc_members[15]._representation._typeCode = (RTICdrTypeCode *)&DDS_g_tc_long;
 
     is_initialized = RTI_TRUE;
 
@@ -414,6 +434,18 @@ RTIBool test_msgs_msg_dds__DynamicArrayPrimitives__initialize_w_params(
     }
     if (allocParams == NULL) {
         return RTI_FALSE;
+    }
+
+    if (allocParams->allocate_memory){
+        sample->my_key= DDS_String_alloc ((32));
+        if (sample->my_key == NULL) {
+            return RTI_FALSE;
+        }
+
+    } else {
+        if (sample->my_key!= NULL) { 
+            sample->my_key[0] = '\0';
+        }
     }
 
     if (allocParams->allocate_memory) {
@@ -596,6 +628,11 @@ void test_msgs_msg_dds__DynamicArrayPrimitives__finalize_w_params(
         return;
     }
 
+    if (sample->my_key != NULL) {
+        DDS_String_free(sample->my_key);
+        sample->my_key=NULL;
+
+    }
     DDS_BooleanSeq_finalize(&sample->bool_values_);
 
     DDS_OctetSeq_finalize(&sample->byte_values_);
@@ -654,6 +691,11 @@ RTIBool test_msgs_msg_dds__DynamicArrayPrimitives__copy(
             return RTI_FALSE;
         }
 
+        if (!RTICdrType_copyStringEx (
+            &dst->my_key, src->my_key, 
+            (32) + 1, RTI_FALSE)){
+            return RTI_FALSE;
+        }
         if (!DDS_BooleanSeq_copy(&dst->bool_values_ ,
         &src->bool_values_ )) {
             return RTI_FALSE;

@@ -18,7 +18,7 @@ module dds_
 
 struct DynamicArrayPrimitives_
 {
-
+  @key string<32> my_key;
   sequence<boolean> bool_values_;
   sequence<octet> byte_values_;
   sequence<char> char_values_;

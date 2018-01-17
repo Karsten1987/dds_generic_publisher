@@ -103,6 +103,11 @@ RTI Connext user manual.
                 RTI tools, making it easier for you to tell one
                 application from another when you're debugging.
                 -->
+                <transport_builtin>
+                  <!--<mask>UDPv4 or MASK_NONE</mask>-->
+                  <mask>UDPv4</mask>
+                </transport_builtin>
+       -->
                 <participant_name>
                     <name>CDRPublisherParticipant</name>
                     <role_name>CDRPublisherParticipantRole</role_name>

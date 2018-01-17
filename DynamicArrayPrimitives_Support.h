@@ -8,8 +8,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the RTI Connext manual.
 */
 
-#ifndef DynamicArrayPrimitives_Support_67051149_h
-#define DynamicArrayPrimitives_Support_67051149_h
+#ifndef DynamicArrayPrimitives_Support_67051174_h
+#define DynamicArrayPrimitives_Support_67051174_h
 
 /* Uses */
 #include "DynamicArrayPrimitives_.h"
@@ -58,5 +58,5 @@ DDS_DATAREADER_CPP(test_msgs_msg_dds__DynamicArrayPrimitives_DataReader, test_ms
 #define NDDSUSERDllExport
 #endif
 
-#endif  /* DynamicArrayPrimitives_Support_67051149_h */
+#endif  /* DynamicArrayPrimitives_Support_67051174_h */
 

@@ -9,8 +9,8 @@ For more information, type 'rtiddsgen -help' at a command shell
 or consult the RTI Connext manual.
 */
 
-#ifndef DynamicArrayPrimitives__67051149_h
-#define DynamicArrayPrimitives__67051149_h
+#ifndef DynamicArrayPrimitives__67051174_h
+#define DynamicArrayPrimitives__67051174_h
 
 #ifndef NDDS_STANDALONE_TYPE
 #ifndef ndds_cpp_h
@@ -43,6 +43,7 @@ class test_msgs_msg_dds__DynamicArrayPrimitives_
     typedef test_msgs_msg_dds__DynamicArrayPrimitives_DataReader DataReader;
     #endif
 
+    DDS_Char *   my_key ;
     DDS_BooleanSeq  bool_values_ ;
     DDS_OctetSeq  byte_values_ ;
     DDS_CharSeq  char_values_ ;

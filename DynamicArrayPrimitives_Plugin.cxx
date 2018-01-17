@@ -163,6 +163,14 @@ test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_print_data(
         return;
     }
 
+    if (sample->my_key==NULL) {
+        RTICdrType_printString(
+            NULL,"my_key", indent_level + 1);
+    } else {
+        RTICdrType_printString(
+            sample->my_key,"my_key", indent_level + 1);    
+    }
+
     if (DDS_BooleanSeq_get_contiguous_bufferI(&sample->bool_values_) != NULL) {
         RTICdrType_printArray(
             DDS_BooleanSeq_get_contiguous_bufferI(&sample->bool_values_),
@@ -376,6 +384,41 @@ test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_print_data(
         &sample->check_, "check_", indent_level + 1);    
 
 }
+test_msgs_msg_dds__DynamicArrayPrimitives_ *
+test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_create_key_ex(RTIBool allocate_pointers){
+    test_msgs_msg_dds__DynamicArrayPrimitives_ *key = NULL;
+
+    key = new (std::nothrow) test_msgs_msg_dds__DynamicArrayPrimitives_KeyHolder ;
+
+    test_msgs_msg_dds__DynamicArrayPrimitives__initialize_ex(key,allocate_pointers, RTI_TRUE);
+
+    return key;
+}
+
+test_msgs_msg_dds__DynamicArrayPrimitives_ *
+test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_create_key(void)
+{
+    return  test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_create_key_ex(RTI_TRUE);
+}
+
+void 
+test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_destroy_key_ex(
+    test_msgs_msg_dds__DynamicArrayPrimitives_KeyHolder *key,RTIBool deallocate_pointers)
+{
+    test_msgs_msg_dds__DynamicArrayPrimitives__finalize_ex(key,deallocate_pointers);
+
+    delete  key;
+    key=NULL;
+
+}
+
+void 
+test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_destroy_key(
+    test_msgs_msg_dds__DynamicArrayPrimitives_KeyHolder *key) {
+
+    test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_destroy_key_ex(key,RTI_TRUE);
+
+}
 
 /* ----------------------------------------------------------------------------
 Callback functions:
@@ -418,6 +461,8 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_on_endpoint_attached(
 
     unsigned int serializedSampleMaxSize;
 
+    unsigned int serializedKeyMaxSize;
+
     if (top_level_registration) {} /* To avoid warnings */
     if (containerPluginContext) {} /* To avoid warnings */
 
@@ -428,11 +473,23 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_on_endpoint_attached(
         test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_create_data,
         (PRESTypePluginDefaultEndpointDataDestroySampleFunction)
         test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_destroy_data,
-        NULL , NULL );
+        (PRESTypePluginDefaultEndpointDataCreateKeyFunction)
+        test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_create_key ,            
+        (PRESTypePluginDefaultEndpointDataDestroyKeyFunction)
+        test_msgs_msg_dds__DynamicArrayPrimitives_PluginSupport_destroy_key);
 
     if (epd == NULL) {
         return NULL;
     } 
+    serializedKeyMaxSize =  test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_serialized_key_max_size(
+        epd,RTI_FALSE,RTI_CDR_ENCAPSULATION_ID_CDR_BE,0);
+
+    if(!PRESTypePluginDefaultEndpointData_createMD5StreamWithInfo(
+        epd,endpoint_info,serializedKeyMaxSize))  
+    {
+        PRESTypePluginDefaultEndpointData_delete(epd);
+        return NULL;
+    }
 
     if (endpoint_info->endpointKind == PRES_TYPEPLUGIN_ENDPOINT_WRITER) {
         serializedSampleMaxSize = test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_serialized_sample_max_size(
@@ -522,6 +579,11 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialize(
     }
 
     if(serialize_sample) {
+
+        if (!RTICdrStream_serializeString(
+            stream, sample->my_key, (32) + 1)) {
+            return RTI_FALSE;
+        }
 
         if (DDS_BooleanSeq_get_contiguous_bufferI(&sample->bool_values_) != NULL) {
             if (!RTICdrStream_serializePrimitiveSequence(
@@ -849,6 +911,10 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_deserialize_sample(
 
             test_msgs_msg_dds__DynamicArrayPrimitives__initialize_ex(sample, RTI_FALSE, RTI_FALSE);
 
+            if (!RTICdrStream_deserializeStringEx(
+                stream,&sample->my_key, (32) + 1, RTI_FALSE)) {
+                goto fin; 
+            }
             {
                 RTICdrUnsignedLong sequence_length;
                 if (DDS_BooleanSeq_get_contiguous_bufferI(&sample->bool_values_) != NULL) {
@@ -1448,6 +1514,9 @@ RTIBool test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_skip(
 
     if (skip_sample) {
 
+        if (!RTICdrStream_skipString (stream, (32)+1)) {
+            goto fin; 
+        }
         {
             RTICdrUnsignedLong sequence_length;
             if (!RTICdrStream_skipPrimitiveSequence(
@@ -1620,6 +1689,9 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_serialized_sample_max_size_
         initial_alignment = 0;
     }
 
+    current_alignment +=RTICdrType_getStringMaxSizeSerialized(
+        current_alignment, (32)+1);
+
     current_alignment +=RTICdrType_getPrimitiveSequenceMaxSizeSerialized(
         current_alignment,(100),RTI_CDR_BOOLEAN_TYPE) ;
 
@@ -1716,6 +1788,8 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_serialized_sample_min_size(
         initial_alignment = 0;
     }
 
+    current_alignment +=RTICdrType_getStringMaxSizeSerialized(
+        current_alignment, 1);
     current_alignment +=    RTICdrType_getPrimitiveSequenceMaxSizeSerialized(
         current_alignment,0, RTI_CDR_BOOLEAN_TYPE);
     current_alignment +=    RTICdrType_getPrimitiveSequenceMaxSizeSerialized(
@@ -1796,6 +1870,10 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_serialized_sample_size(
             endpoint_data,
             current_alignment);
     }
+
+    current_alignment += RTICdrType_getStringSerializedSize(
+        PRESTypePluginDefaultEndpointData_getAlignment(
+            endpoint_data, current_alignment), sample->my_key);
 
     current_alignment += RTICdrType_getPrimitiveSequenceSerializedSize(
         PRESTypePluginDefaultEndpointData_getAlignment(
@@ -1908,7 +1986,7 @@ Key Management functions:
 PRESTypePluginKeyKind 
 test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_key_kind(void)
 {
-    return PRES_TYPEPLUGIN_NO_KEY;
+    return PRES_TYPEPLUGIN_USER_KEY;
 }
 
 RTIBool 
@@ -1923,6 +2001,9 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialize_key(
 {
     char * position = NULL;
 
+    if (endpoint_data) {} /* To avoid warnings */
+    if (endpoint_plugin_qos) {} /* To avoid warnings */
+
     if(serialize_encapsulation) {
         if (!RTICdrStream_serializeAndSetCdrEncapsulation(stream , encapsulation_id)) {
             return RTI_FALSE;
@@ -1933,13 +2014,8 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialize_key(
 
     if(serialize_key) {
 
-        if (!test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialize(
-            endpoint_data,
-            sample,
-            stream,
-            RTI_FALSE, encapsulation_id,
-            RTI_TRUE,
-            endpoint_plugin_qos)) {
+        if (!RTICdrStream_serializeString(
+            stream, sample->my_key, (32) + 1)) {
             return RTI_FALSE;
         }
 
@@ -1977,10 +2053,8 @@ RTIBool test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_deserialize_key_sample(
         }
         if (deserialize_key) {
 
-            if (!test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_deserialize_sample(
-                endpoint_data, sample, stream, 
-                RTI_FALSE, RTI_TRUE, 
-                endpoint_plugin_qos)) {
+            if (!RTICdrStream_deserializeStringEx(
+                stream,&sample->my_key, (32) + 1, RTI_FALSE)) {
                 return RTI_FALSE;
             }
         }
@@ -2048,8 +2122,8 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_serialized_key_max_size_ex(
         initial_alignment = 0;
     }
 
-    current_alignment += test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_serialized_sample_max_size_ex(
-        endpoint_data, overflow,RTI_FALSE, encapsulation_id, current_alignment);
+    current_alignment +=RTICdrType_getStringMaxSizeSerialized(
+        current_alignment, (32)+1);
 
     if (include_encapsulation) {
         current_alignment += encapsulation_size;
@@ -2091,6 +2165,9 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialized_sample_to_key(
     RTIBool done = RTI_FALSE;
     RTIBool error = RTI_FALSE;
 
+    if (endpoint_data) {} /* To avoid warnings */
+    if (endpoint_plugin_qos) {} /* To avoid warnings */
+
     if (stream == NULL) {
         error = RTI_TRUE;
         goto fin;
@@ -2104,10 +2181,152 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialized_sample_to_key(
 
     if (deserialize_key) {
 
-        if (!test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_deserialize_sample(
-            endpoint_data, sample, stream, RTI_FALSE, 
-            RTI_TRUE, endpoint_plugin_qos)) {
+        if (!RTICdrStream_deserializeStringEx(
+            stream,&sample->my_key, (32) + 1, RTI_FALSE)) {
             return RTI_FALSE;
+        }
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_BOOLEAN_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_OCTET_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_CHAR_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_FLOAT_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_DOUBLE_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_OCTET_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_OCTET_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_SHORT_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_UNSIGNED_SHORT_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_LONG_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_UNSIGNED_LONG_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_LONG_LONG_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipPrimitiveSequence(
+                stream,
+                &sequence_length,
+                RTI_CDR_UNSIGNED_LONG_LONG_TYPE)){
+                goto fin; 
+            }
+        }
+
+        {
+            RTICdrUnsignedLong sequence_length;
+            if (!RTICdrStream_skipStringSequence(
+                stream,
+                &sequence_length,
+                (255) + 1,     RTI_CDR_CHAR_TYPE)){
+                goto fin; 
+            }
+        }
+
+        if (!RTICdrStream_skipLong (stream)) {
+            goto fin; 
         }
 
     }
@@ -2126,6 +2345,197 @@ test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialized_sample_to_key(
 
     if(deserialize_encapsulation) {
         RTICdrStream_restoreAlignment(stream,position);
+    }
+
+    return RTI_TRUE;
+}
+
+RTIBool 
+test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_instance_to_key(
+    PRESTypePluginEndpointData endpoint_data,
+    test_msgs_msg_dds__DynamicArrayPrimitives_KeyHolder *dst, 
+    const test_msgs_msg_dds__DynamicArrayPrimitives_ *src)
+{
+
+    if (endpoint_data) {} /* To avoid warnings */   
+
+    if (!RTICdrType_copyStringEx (
+        &dst->my_key, src->my_key, 
+        (32) + 1, RTI_FALSE)){
+        return RTI_FALSE;
+    }
+    return RTI_TRUE;
+}
+
+RTIBool 
+test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_key_to_instance(
+    PRESTypePluginEndpointData endpoint_data,
+    test_msgs_msg_dds__DynamicArrayPrimitives_ *dst, const
+    test_msgs_msg_dds__DynamicArrayPrimitives_KeyHolder *src)
+{
+
+    if (endpoint_data) {} /* To avoid warnings */   
+    if (!RTICdrType_copyStringEx (
+        &dst->my_key, src->my_key, 
+        (32) + 1, RTI_FALSE)){
+        return RTI_FALSE;
+    }
+    return RTI_TRUE;
+}
+
+RTIBool 
+test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_instance_to_keyhash(
+    PRESTypePluginEndpointData endpoint_data,
+    DDS_KeyHash_t *keyhash,
+    const test_msgs_msg_dds__DynamicArrayPrimitives_ *instance)
+{
+    struct RTICdrStream * md5Stream = NULL;
+    struct RTICdrStreamState cdrState;
+    char * buffer = NULL;
+
+    RTICdrStreamState_init(&cdrState);
+    md5Stream = PRESTypePluginDefaultEndpointData_getMD5Stream(endpoint_data);
+
+    if (md5Stream == NULL) {
+        return RTI_FALSE;
+    }
+
+    RTICdrStream_resetPosition(md5Stream);
+    RTICdrStream_setDirtyBit(md5Stream, RTI_TRUE);
+
+    if (!test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialize_key(
+        endpoint_data,
+        instance,
+        md5Stream, 
+        RTI_FALSE, 
+        RTI_CDR_ENCAPSULATION_ID_CDR_BE, 
+        RTI_TRUE,
+        NULL)) 
+    {
+        int size;
+
+        RTICdrStream_pushState(md5Stream, &cdrState, -1);
+
+        size = (int)test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_serialized_sample_size(
+            endpoint_data,
+            RTI_FALSE,
+            RTI_CDR_ENCAPSULATION_ID_CDR_BE,
+            0,
+            instance);
+
+        if (size <= RTICdrStream_getBufferLength(md5Stream)) {
+            RTICdrStream_popState(md5Stream, &cdrState);        
+            return RTI_FALSE;
+        }   
+
+        RTIOsapiHeap_allocateBuffer(&buffer,size,0);
+
+        if (buffer == NULL) {
+            RTICdrStream_popState(md5Stream, &cdrState);
+            return RTI_FALSE;
+        }
+
+        RTICdrStream_set(md5Stream, buffer, size);
+        RTIOsapiMemory_zero(
+            RTICdrStream_getBuffer(md5Stream),
+            RTICdrStream_getBufferLength(md5Stream));
+        RTICdrStream_resetPosition(md5Stream);
+        RTICdrStream_setDirtyBit(md5Stream, RTI_TRUE);
+        if (!test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialize_key(
+            endpoint_data,
+            instance,
+            md5Stream, 
+            RTI_FALSE, 
+            RTI_CDR_ENCAPSULATION_ID_CDR_BE, 
+            RTI_TRUE,
+            NULL)) 
+        {
+            RTICdrStream_popState(md5Stream, &cdrState);
+            RTIOsapiHeap_freeBuffer(buffer);
+            return RTI_FALSE;
+        }        
+    }   
+
+    if (PRESTypePluginDefaultEndpointData_getMaxSizeSerializedKey(endpoint_data) > 
+    (unsigned int)(MIG_RTPS_KEY_HASH_MAX_LENGTH) ||
+    PRESTypePluginDefaultEndpointData_forceMD5KeyHash(endpoint_data)) {
+        RTICdrStream_computeMD5(md5Stream, keyhash->value);
+    } else {
+        RTIOsapiMemory_zero(keyhash->value,MIG_RTPS_KEY_HASH_MAX_LENGTH);
+        RTIOsapiMemory_copy(
+            keyhash->value, 
+            RTICdrStream_getBuffer(md5Stream), 
+            RTICdrStream_getCurrentPositionOffset(md5Stream));
+    }
+
+    keyhash->length = MIG_RTPS_KEY_HASH_MAX_LENGTH;
+
+    if (buffer != NULL) {
+        RTICdrStream_popState(md5Stream, &cdrState);
+        RTIOsapiHeap_freeBuffer(buffer);
+    }
+
+    return RTI_TRUE;
+}
+
+RTIBool 
+test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialized_sample_to_keyhash(
+    PRESTypePluginEndpointData endpoint_data,
+    struct RTICdrStream *stream, 
+    DDS_KeyHash_t *keyhash,
+    RTIBool deserialize_encapsulation,
+    void *endpoint_plugin_qos) 
+{   
+    char * position = NULL;
+
+    RTIBool done = RTI_FALSE;
+    RTIBool error = RTI_FALSE;
+    test_msgs_msg_dds__DynamicArrayPrimitives_ * sample=NULL;
+
+    if (endpoint_plugin_qos) {} /* To avoid warnings */
+    if (stream == NULL) {
+        error = RTI_TRUE;
+        goto fin;
+    }
+
+    if(deserialize_encapsulation) {
+        if (!RTICdrStream_deserializeAndSetCdrEncapsulation(stream)) {
+            return RTI_FALSE;
+        }
+
+        position = RTICdrStream_resetAlignment(stream);
+    }
+
+    sample = (test_msgs_msg_dds__DynamicArrayPrimitives_ *)
+    PRESTypePluginDefaultEndpointData_getTempSample(endpoint_data);
+
+    if (sample == NULL) {
+        return RTI_FALSE;
+    }
+
+    if (!RTICdrStream_deserializeStringEx(
+        stream,&sample->my_key, (32) + 1, RTI_FALSE)) {
+        return RTI_FALSE;
+    }
+    done = RTI_TRUE;
+  fin:
+    if(!error) {
+        if (done != RTI_TRUE && 
+        RTICdrStream_getRemainder(stream) >=
+        RTI_CDR_PARAMETER_HEADER_ALIGNMENT) {
+            return RTI_FALSE;   
+        }
+    } else {
+        return RTI_FALSE;
+    } 
+
+    if(deserialize_encapsulation) {
+        RTICdrStream_restoreAlignment(stream,position);
+    }
+
+    if (!test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_instance_to_keyhash(
+        endpoint_data, keyhash, sample)) {
+        return RTI_FALSE;
     }
 
     return RTI_TRUE;
@@ -2197,19 +2607,40 @@ struct PRESTypePlugin *test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_new(void
     (PRESTypePluginGetKeyKindFunction)
     test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_key_kind;
 
-    /* These functions are only used for keyed types. As this is not a keyed
-    type they are all set to NULL
-    */
-    plugin->serializeKeyFnc = NULL ;    
-    plugin->deserializeKeyFnc = NULL;  
-    plugin->getKeyFnc = NULL;
-    plugin->returnKeyFnc = NULL;
-    plugin->instanceToKeyFnc = NULL;
-    plugin->keyToInstanceFnc = NULL;
-    plugin->getSerializedKeyMaxSizeFnc = NULL;
-    plugin->instanceToKeyHashFnc = NULL;
-    plugin->serializedSampleToKeyHashFnc = NULL;
-    plugin->serializedKeyToKeyHashFnc = NULL;    
+    plugin->getSerializedKeyMaxSizeFnc =   
+    (PRESTypePluginGetSerializedKeyMaxSizeFunction)
+    test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_serialized_key_max_size;
+    plugin->serializeKeyFnc =
+    (PRESTypePluginSerializeKeyFunction)
+    test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialize_key;
+    plugin->deserializeKeyFnc =
+    (PRESTypePluginDeserializeKeyFunction)
+    test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_deserialize_key;
+    plugin->deserializeKeySampleFnc =
+    (PRESTypePluginDeserializeKeySampleFunction)
+    test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_deserialize_key_sample;
+
+    plugin-> instanceToKeyHashFnc = 
+    (PRESTypePluginInstanceToKeyHashFunction)
+    test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_instance_to_keyhash;
+    plugin->serializedSampleToKeyHashFnc = 
+    (PRESTypePluginSerializedSampleToKeyHashFunction)
+    test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_serialized_sample_to_keyhash;
+
+    plugin->getKeyFnc =
+    (PRESTypePluginGetKeyFunction)
+    test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_get_key;
+    plugin->returnKeyFnc =
+    (PRESTypePluginReturnKeyFunction)
+    test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_return_key;
+
+    plugin->instanceToKeyFnc =
+    (PRESTypePluginInstanceToKeyFunction)
+    test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_instance_to_key;
+    plugin->keyToInstanceFnc =
+    (PRESTypePluginKeyToInstanceFunction)
+    test_msgs_msg_dds__DynamicArrayPrimitives_Plugin_key_to_instance;
+    plugin->serializedKeyToKeyHashFnc = NULL; /* Not supported yet */
     plugin->typeCode =  (struct RTICdrTypeCode *)test_msgs_msg_dds__DynamicArrayPrimitives__get_typecode();
 
     plugin->languageKind = PRES_TYPEPLUGIN_CPP_LANG;
